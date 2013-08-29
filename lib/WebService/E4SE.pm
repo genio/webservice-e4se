@@ -240,7 +240,6 @@ has files => (
 		'Tax.asmx',
 		'Time.asmx',
 		'UOM.asmx',
-		'chase.asmx',
 	]},
 );
 
@@ -293,7 +292,7 @@ sub _wsdl {
 =head1 SYNOPSIS
 
 Epicor's L<http://www.epicor.com/Products/Pages/E4SE.aspx> E4SE software
-uses a clunky, IE-Only interface (just try to fill in your timesheet with
+uses a clunky, IE-only interface (just try to fill in your timesheet with
 a non-windows machine!  I dare ya!).
 
 Each action on the software calls a SOAP-based web service API method.
