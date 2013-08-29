@@ -25,7 +25,6 @@ WriteMakefile(
         'Moose' => 2.0,
         'MooseX::Types::Moose' => 0.2,
         'XML::LibXML::Simple' => 2.0,
-        'Try::Tiny' => 0.1,
         'URI' => 1.6,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
