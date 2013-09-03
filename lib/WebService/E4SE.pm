@@ -23,12 +23,12 @@ WebService::E4SE - Communicate with the various Epicor E4SE web services.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
 our $AUTHORITY = 'cpan:CAPOEIRAB';
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has useragent => (
 	is => 'ro',
@@ -353,7 +353,9 @@ Here's some sample code:
 The constructor will give you a new WebService::E4SE object.  The parameters passed to it are all listed below.  They have defaults
 and since this is a L<Moose> object, you can set each one individually as well with $ws->param_name($foo).
 
-=head3 parameters
+=over
+
+=item parameters
 
 =over
 
@@ -381,6 +383,8 @@ Type is L<URL>. Default is URL->new('http://epicor/e4se').  This should be the b
 =item timeout
 
 Default is 30.  This is passed to L<LWP::UserAgent> to handle how long you want to wait on responses.
+
+=back
 
 =back
 
