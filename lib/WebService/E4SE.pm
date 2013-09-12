@@ -34,6 +34,7 @@ has useragent => (
 	is => 'ro',
 	isa => 'LWP::UserAgent',
 	required => 1,
+	iti_arg => undef,
 	default => sub {
 		my $lwp = LWP::UserAgent->new( keep_alive=>1 )
 	}
@@ -87,6 +88,7 @@ has wsdl => (
 	is => 'rw',
 	isa => 'HashRef[XML::Compile::WSDL11]',
 	required => 0,
+	init_arg => undef,
 	default => sub { {} },
 );
 
@@ -101,6 +103,7 @@ has files => (
 	is => 'ro',
 	isa => 'ArrayRef[Str]',
 	required => 1,
+	init_arg => undef,
 	default => sub {[
 		'ActionCall.asmx',
 		'BackOfficeAP.asmx',
@@ -350,8 +353,7 @@ Here's some sample code:
 
 =head2 new( %params )
 
-The constructor will give you a new WebService::E4SE object.  The parameters passed to it are all listed below.  They have defaults
-and since this is a L<Moose> object, you can set each one individually as well with $ws->param_name($foo).
+The constructor will give you a new WebService::E4SE object.  The parameters passed to it are all listed below.  They have defaults and since this is a L<Moose> object, you can set each one individually as well by using the parameter name as a method call.
 
 =over
 
@@ -365,8 +367,7 @@ Default is an empty string.  Usually, you need to prefix this with the domain yo
 
 =item password
 
-Default is an empty string.  This will be your domain password.  No attempt to hide this is made as E4SE cannot function over SSL anyway, why should
-I bother trying to make you feel secure when you're not.
+Default is an empty string.  This will be your domain password.  No attempt to hide this is made as E4SE cannot function over SSL anyway, why should I bother trying to make you feel secure when you're not.
 
 =item realm
 
@@ -390,14 +391,13 @@ Default is 30.  This is passed to L<LWP::UserAgent> to handle how long you want 
 
 =head2 files()
 
-This method will return a reference to an array file names that this web service has knowledge of for an E4SE installation.
+This method will return a reference to an array of file names that this web service has knowledge of for an E4SE installation.
 
   my $files = $ws->files;  # 'ActionCall.asmx', 'Company.asmx', 'Resource.asmx', etc....
 
 =head2 call( $file, $function, %parameters )
 
-This method will call an API method for the file you want.  It will return 0 and warn on errors outside of L<XML::Compile::WSDL11>'s knowledge, otherwise
-it's just a little wrapper around L<XML::Compile::WSDL11>->call();
+This method will call an API method for the file you want.  It will return 0 and warn on errors outside of L<XML::Compile::WSDL11>'s knowledge, otherwise it's just a little wrapper around L<XML::Compile::WSDL11>->call();
 
 Another way to do this would be $ws->get_object('Reource.asmx')->call( $function, %params );
 
@@ -435,7 +435,7 @@ be reset to false directly after the next WSDL object setup.
 sub call {
 	my ( $self, $file, $function, %parameters ) = @_;
 	unless ( $self->_valid_file($file) ) {
-		warn "$file is not a valid web service found in E4SE.";
+		Carp::carp( "$file is not a valid web service found in E4SE." );
 		return 0;
 	}
 	my $wsdl = $self->wsdl;
@@ -451,7 +451,7 @@ sub call {
 sub get_object {
 	my ( $self, $file ) = @_;
 	unless ( $self->_valid_file($file) ) {
-		warn "$file is not a valid web service found in E4SE.";
+		Carp::carp( "$file is not a valid web service found in E4SE." );
 		return 0;
 	}
 	my $wsdl = $self->wsdl;
@@ -466,7 +466,7 @@ sub get_object {
 sub operations {
 	my ( $self, $file ) = @_;
 	unless ( $self->_valid_file($file) ) {
-		warn "$file is not a valid web service found in E4SE.";
+		Carp::carp( "$file is not a valid web service found in E4SE." );
 		return [];
 	}
 	my $port = $self->_get_port($file); # could be done with a regex, but might as well normalize it
