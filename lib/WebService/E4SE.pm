@@ -4,18 +4,17 @@ use 5.006;
 use Moose;
 use MooseX::Types::Moose qw/Bool HashRef/;
 use Carp;
-use URI 1.60;
+
+use Authen::NTLM 1.09;
 use LWP::UserAgent 6.02;
 use HTTP::Headers;
 use HTTP::Request;
-use Authen::NTLM;
-use XML::LibXML::Simple;
+use URI 1.60;
+use XML::Compile::SOAP11 2.38;
 use XML::Compile::WSDL11;
-use XML::Compile::SOAP11;
 use XML::Compile::Transport::SOAPHTTP;
-use namespace::autoclean;
 
-use Data::Dumper;
+use namespace::autoclean;
 
 =head1 NAME
 
@@ -29,12 +28,12 @@ Version 0.02
 
 our $AUTHORITY = 'cpan:CAPOEIRAB';
 our $VERSION = '0.02';
-
+#$Carp::Verbose = 1;
 has useragent => (
 	is => 'ro',
 	isa => 'LWP::UserAgent',
 	required => 1,
-	iti_arg => undef,
+	init_arg => undef,
 	default => sub {
 		my $lwp = LWP::UserAgent->new( keep_alive=>1 )
 	}
@@ -56,21 +55,21 @@ has username => (
 
 has password => (
 	is => 'rw',
-	isa => 'Maybe[Str]',
+	isa => 'Str',
 	required => 1,
 	default => '',
 );
 
 has realm => (
 	is => 'rw',
-	isa => 'Maybe[Str]',
+	isa => 'Str',
 	required => 1,
 	default => '',
 );
 
 has site => (
 	is => 'rw',
-	isa => 'Maybe[Str]',
+	isa => 'Str',
 	required => 1,
 	default => 'epicor:80',
 );
@@ -89,6 +88,7 @@ has wsdl => (
 	isa => 'HashRef[XML::Compile::WSDL11]',
 	required => 0,
 	init_arg => undef,
+	lazy => 1,
 	default => sub { {} },
 );
 
@@ -103,6 +103,7 @@ has files => (
 	is => 'ro',
 	isa => 'ArrayRef[Str]',
 	required => 1,
+	lazy => 1,
 	init_arg => undef,
 	default => sub {[
 		'ActionCall.asmx',
@@ -262,7 +263,7 @@ sub _valid_file {
 
 sub _wsdl {
 	my ( $self, $file ) = @_;
-	my $wsdl = $self->wsdl;
+	my $wsdl = $self->wsdl();
 	#if our wsdl is already setup, let's just return
 	return 1 if ( exists($wsdl->{$file}) && defined($wsdl->{$file}) );
 
@@ -270,23 +271,26 @@ sub _wsdl {
 	$self->useragent->credentials( $self->site, $self->realm, $self->username, $self->password );
 	$self->useragent->timeout($self->timeout);
 
-	my $port = $self->_get_port($file);
 	my $res = $self->useragent->get($self->base_url . '/'. $file . '?WSDL' );
 	unless ( $res->is_success ) {
-		warn "Unable to setup WSDL: ".$res->status_line();
+		Carp::carp( "Unable to setup WSDL: ".$res->status_line() );
 		return 0;
 	}
 	$wsdl->{$file} = XML::Compile::WSDL11->new( $res->decoded_content );
 	unless ( $wsdl->{$file} ) {
-		warn "Unable to create new XML::Compile::WSDL11 object";
+		Carp::carp( "Unable to create new XML::Compile::WSDL11 object" );
 		return 0;
 	}
 	my $trans = XML::Compile::Transport::SOAPHTTP->new(
 		user_agent=> $self->useragent,
 		address => $self->base_url.'/'. $file,
 	);
+	unless ( $trans ) {
+		Carp::carp( "Unable to create new XML::Compile::Transport::SOAPHTTP object" );
+		return 0;
+	}
 	$wsdl->{$file}->compileCalls(
-		port => $port,
+		port => $self->_get_port($file),
 		transport => $trans,
 	);
 	return 1;
@@ -438,7 +442,7 @@ sub call {
 		Carp::carp( "$file is not a valid web service found in E4SE." );
 		return 0;
 	}
-	my $wsdl = $self->wsdl;
+	my $wsdl = $self->wsdl();
 	if ( $self->force_wsdl_reload() ) {
 		delete($wsdl->{$file}) if exists($wsdl->{$file});
 		$self->force_wsdl_reload(0);
@@ -469,16 +473,14 @@ sub operations {
 		Carp::carp( "$file is not a valid web service found in E4SE." );
 		return [];
 	}
-	my $port = $self->_get_port($file); # could be done with a regex, but might as well normalize it
-	my $wsdl = $self->wsdl;
 	if ( $self->force_wsdl_reload() ) {
-		delete($wsdl->{$file}) if exists($wsdl->{$file});
+		delete($self->wsdl->{$file}) if exists($self->wsdl->{$file});
 		$self->force_wsdl_reload(0);
 	}
 	unless ( $self->_wsdl($file) ) {
 		return [];
 	}
-	my @ops = $wsdl->{$file}->operations(port=>$port);
+	my @ops = $self->wsdl->{$file}->operations(port=>$self->_get_port($file));
 	my @ret = ();
 	for my $op ( @ops ) {
 		push @ret, $op->name;
