@@ -11,8 +11,10 @@ use HTTP::Headers;
 use HTTP::Request;
 use URI 1.60;
 use XML::Compile::SOAP11 2.38;
+use XML::Compile::SOAP11::Client;
 use XML::Compile::WSDL11;
 use XML::Compile::Transport::SOAPHTTP;
+use XML::LibXML;
 
 use namespace::autoclean;
 
@@ -107,6 +109,7 @@ has files => (
 	init_arg => undef,
 	default => sub {[
 		'ActionCall.asmx',
+		'Attachment.asmx',
 		'BackOfficeAP.asmx',
 		'BackOfficeAR.asmx',
 		'BackOfficeCFG.asmx',
@@ -166,6 +169,7 @@ has files => (
 		'Site.asmx',
 		'Supplier.asmx',
 		'svActionCall.asmx',
+		'svAttachment.asmx',
 		'svBackOfficeAP.asmx',
 		'svBackOfficeAR.asmx',
 		'svBackOfficeCFG.asmx',
