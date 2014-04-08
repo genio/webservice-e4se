@@ -1,12 +1,10 @@
 Revision history for WebService-E4SE
 
-0.021   2014-04-08 13:15 EDT
+0.02    2014-04-08 13:15 EDT
         Added necessary dependencies.
         Fixed some errors with testing.
         Got rid of README.pod
         Added README.md for GitHub
-
-0.02    2013-09-.. 01:01 EST
 		Fixed some documentation errors.
 		Added more documentation examples.
 		Fixed some error handling to use Carp instead of warn() and die().

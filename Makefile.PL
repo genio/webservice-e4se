@@ -31,8 +31,9 @@ WriteMakefile(
 		'Test::Pod::Coverage' => 0,
     },
     PREREQ_PM => {
-        'XML::Compile::SOAP' => 3.0,
-        'XML::Compile::WSDL11' => 3.0,
+        'XML::Compile::SOAP' => 2.38,
+        'XML::Compile::WSDL11' => 2.38,
+        'XML::LibXML' => 1.94,
         'Authen::NTLM' => 1.0,
         'HTTP::Headers' => 6.0,
         'HTTP::Request' => 6.0,
