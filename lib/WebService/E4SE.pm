@@ -438,6 +438,10 @@ This property is defaulted to false (0).  If set to true, the next call to a met
 go out to the server and re-grab the WSDL and re-setup that WSDL object no matter if we have already generated it or not.  The property will
 be reset to false directly after the next WSDL object setup.
 
+=head2 operations( $file )
+
+This method will return a list of  L<XML::Compile::SOAP::Operation> objects that are available for the given file.
+
 =cut
 
 sub call {
