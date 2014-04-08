@@ -1,5 +1,4 @@
 use strict;
-use warnings FATAL => 'all';
 use Test::More;
 
 plan skip_all => 'set TEST_POD to enable this test (developer only!)'
@@ -8,4 +7,3 @@ plan skip_all => 'Test::Pod 1.14 required for this test!'
 	unless eval 'use Test::Pod 1.14; 1';
 
 all_pod_files_ok();
-done_testing();

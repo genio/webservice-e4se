@@ -1,5 +1,4 @@
 use strict;
-use warnings FATAL => 'all';
 use Test::More;
 
 plan skip_all => 'set TEST_POD to enable this test (developer only!)'
@@ -12,4 +11,3 @@ my @tophat = qw(content_xml get_line replace_content text_after text_before to_x
 
 # False positive constants
 all_pod_coverage_ok({also_private => [qw(IPV6 TLS), @tophat]});
-done_testing();

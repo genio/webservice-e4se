@@ -1,6 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
-use Test::More;
+use Test::More tests => 21;
 use URI;
 
 use FindBin;
@@ -37,4 +37,3 @@ isa_ok($ws->files, 'ARRAY');
 
 
 #diag( "Testing WebService::E4SE $WebService::E4SE::VERSION, Perl $], $^X" );
-done_testing();
