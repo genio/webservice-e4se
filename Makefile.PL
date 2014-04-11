@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Chase Whitener <cwhitener@gmail.com>},
     VERSION_FROM     => 'lib/WebService/E4SE.pm',
     ABSTRACT_FROM    => 'lib/WebService/E4SE.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'Artistic_2',
     META_MERGE   => {
         requires  => {perl => '5.010001'},
 		resources => {
