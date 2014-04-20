@@ -14,15 +14,15 @@ The purpose of this module is to somewhat abstract out the tedium of dealing wit
 
 ## Installation
 
-  All you need is a one-liner, it takes less than a minute.
+  Installation is simple via the CPAN.
 
     $ cpan install WebService::E4SE
 
-  We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
+  [Perlbrew](http://perlbrew.pl) environments are recommended.
 
 ## Getting Started
 
-  These three lines are a whole web application.
+  This short snippet should get you going.
 
 ```perl
 #!/usr/bin/env perl
