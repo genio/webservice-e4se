@@ -1,5 +1,6 @@
 language: perl
 perl:
+  - "5.20"
   - "5.18"
   - "5.16"
   - "5.14"
@@ -8,4 +9,8 @@ perl:
 env:
   - "HARNESS_OPTIONS=j9 TEST_POD=1"
 install:
+  - "cpanm -n Test::More Test::Pod Test::Pod::Coverage"
   - "cpanm -n --installdeps ."
+sudo: false
+notifications:
+  email: false

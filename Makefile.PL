@@ -1,4 +1,4 @@
-use 5.006;
+use 5.0100001;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -20,7 +20,7 @@ WriteMakefile(
 		no_index => {directory => ['t']}
 	},
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -37,10 +37,10 @@ WriteMakefile(
         'HTTP::Headers' => 6.0,
         'HTTP::Request' => 6.0,
         'LWP::UserAgent' => 6.0,
-        'Moose' => 2.0,
-        'MooseX::Types::Moose' => 0.2,
+        'Moo' => 2.0,
+        'strictures' => 2.0,
         'URI' => 1.6,
-        'namespace::autoclean' => 0,
+        'namespace::clean' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-E4SE-*' },
