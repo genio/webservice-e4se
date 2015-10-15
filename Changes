@@ -1,5 +1,10 @@
 Revision history for WebService-E4SE
 
+0.04    2015-10-14
+    Fixed problems with newer version of XML::Compile
+    Mocked up a few more tests to get coverage to 90%
+    Made the Makefile use meta spec 2
+
 0.03    2015-10-14
     Fixed some links and POD
     Got rid of wantarray
