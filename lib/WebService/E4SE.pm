@@ -7,11 +7,12 @@ use HTTP::Headers;
 use HTTP::Request;
 use Scalar::Util ();
 use URI 1.60;
-use XML::Compile::SOAP11 2.38;
-use XML::Compile::SOAP11::Client;
-use XML::Compile::WSDL11;
-use XML::Compile::Transport::SOAPHTTP;
-use XML::LibXML;
+use XML::Compile::SOAP11 ();
+use XML::Compile::SOAP12 ();
+use XML::Compile::SOAP11::Client ();
+use XML::Compile::WSDL11 ();
+use XML::Compile::Transport::SOAPHTTP ();
+use XML::LibXML ();
 
 use Carp ();
 use strictures 2;
@@ -21,14 +22,9 @@ use v5.10;
 our $AUTHORITY = 'cpan:CAPOEIRAB';
 our $VERSION = '0.03';
 
-has _wsdls => (
-	is => 'lazy',
-	isa => sub { die "Not a HashRef" unless ref($_[0]) eq 'HASH' },
-	default => sub { {} },
-);
-
 has _ua => (
-	is => 'lazy',
+	is => 'rw',
+	lazy => 1,
 	isa => sub { die "Not an LWP::UserAgent" unless Scalar::Util::blessed($_[0]) && $_[0]->isa('LWP::UserAgent') },
 	default => sub { LWP::UserAgent->new( keep_alive=>1 ) },
 );
@@ -36,14 +32,16 @@ has _ua => (
 has base_url => (
 	is => 'rw',
 	isa => sub {die "Not an URI" unless Scalar::Util::blessed($_[0]) && $_[0]->isa('URI')},
+	coerce => sub { (Scalar::Util::blessed($_[0]) && $_[0]->isa('URI'))? $_[0] : URI->new($_[0]) },
 	required => 1,
 	default => sub {
-		URI->new('http://epicor/e4se')
+		URI->new('http://epicor/e4se/')
 	}
 );
 
 has files => (
-	is => 'lazy',
+	is => 'rw',
+	lazy => 1,
 	isa => sub { die 'Should be an array reference' unless $_[0] && ref($_[0]) eq 'ARRAY' },
 	default => sub {[
 		'ActionCall.asmx',
@@ -234,85 +232,56 @@ sub _valid_file {
 	return 0;
 }
 
-sub _wsdl {
-	my ( $self, $file ) = @_;
-	my $wsdl = $self->_wsdls();
-	#if our wsdl is already setup, let's just return
-	return 1 if ( exists($wsdl->{$file}) && defined($wsdl->{$file}) );
-
-	#wsdl doesn't exist.  let's setup the user agent for our transport and move along
-	$self->_ua->credentials( $self->site, $self->realm, $self->username, $self->password );
-
-	my $res = $self->_ua->get($self->base_url . '/'. $file . '?WSDL' );
-	Carp::croak('Unable to setup WSDL: '.$res->status_lin()) unless $res->is_success;
-
-	$wsdl->{$file} = XML::Compile::WSDL11->new( $res->decoded_content );
-	Carp::croak( "Unable to create new XML::Compile::WSDL11 object" ) unless $wsdl->{$file};
-
-	my $trans = XML::Compile::Transport::SOAPHTTP->new(
-		user_agent=> $self->_ua,
-		address => $self->base_url.'/'. $file,
-	);
-	Carp::carp( "Unable to create new XML::Compile::Transport::SOAPHTTP object" ) unless $trans;
-
-	$wsdl->{$file}->compileCalls(
-		port => $self->_get_port($file),
-		transport => $trans,
-	);
-	$self->_wsdls($wsdl);
-	return 1;
-}
-
 sub call {
 	my ( $self, $file, $function, %parameters ) = @_;
-	unless ( $self->_valid_file($file) ) {
-		Carp::carp( "$file is not a valid web service found in E4SE." );
-		return 0;
-	}
-	my $wsdl = $self->wsdl();
-	if ( $self->force_wsdl_reload() ) {
-		delete($wsdl->{$file}) if exists($wsdl->{$file});
-		$self->force_wsdl_reload(0);
-	}
-	return 0 unless $self->_wsdl($file);
+	Carp::croak( "$file is not a valid web service found in E4SE." ) unless $self->_valid_file($file);
 
-	return $wsdl->{$file}->call($function,%parameters);
+	my $wsdl = $self->get_object($file);
+	Carp::croak("Couldn't obtain the WSDL") unless $wsdl;
+
+	return $wsdl->call($function,%parameters);
 }
 
 sub get_object {
 	my ( $self, $file ) = @_;
-	unless ( $self->_valid_file($file) ) {
-		Carp::carp( "$file is not a valid web service found in E4SE." );
-		return 0;
-	}
-	my $wsdl = $self->wsdl;
+	$self->{cache} //= {};
+	Carp::croak( "$file is not a valid web service found in E4SE." ) unless $self->_valid_file($file);
+	my $cache = $self->{cache};
 	if ( $self->force_wsdl_reload() ) {
-		delete($wsdl->{$file}) if exists($wsdl->{$file});
+		delete($cache->{$file});
 		$self->force_wsdl_reload(0);
 	}
-	return 0 unless $self->_wsdl($file);
-	return $wsdl->{$file};
+	#if our wsdl is already setup, let's just return
+	return $cache->{$file} if ( exists($cache->{$file}) && defined($cache->{$file}) );
+
+	#wsdl doesn't exist.  let's setup the user agent for our transport and move along
+	$self->_ua->credentials( $self->site, $self->realm, $self->username, $self->password );
+
+	my $res = $self->_ua->get(URI->new("$file?WSDL")->abs($self->base_url));
+	Carp::croak("Unable to grab the WSDL from $file: ".$res->status_line()) unless $res->is_success;
+
+	$cache->{$file} = XML::Compile::WSDL11->new( $res->decoded_content, server_type=>'SharePoint' );
+	Carp::croak( "Unable to create new XML::Compile::WSDL11 object" ) unless $cache->{$file};
+
+	my $trans = XML::Compile::Transport::SOAPHTTP->new(
+		user_agent=> $self->_ua,
+		address => URI->new($file)->abs($self->base_url),
+	);
+	Carp::carp( "Unable to create new XML::Compile::Transport::SOAPHTTP object" ) unless $trans;
+
+	$cache->{$file}->compileCalls(
+		port => $self->_get_port($file),
+		transport => $trans,
+	);
+	return $cache->{$file};
 }
 
 sub operations {
 	my ( $self, $file ) = @_;
-	unless ( $self->_valid_file($file) ) {
-		Carp::carp( "$file is not a valid web service found in E4SE." );
-		return [];
-	}
-	if ( $self->force_wsdl_reload() ) {
-		delete($self->wsdl->{$file}) if exists($self->wsdl->{$file});
-		$self->force_wsdl_reload(0);
-	}
-	unless ( $self->_wsdl($file) ) {
-		return [];
-	}
-	my @ops = $self->wsdl->{$file}->operations(port=>$self->_get_port($file));
-	my @ret = ();
-	for my $op ( @ops ) {
-		push @ret, $op->name;
-	}
-	return \@ret;
+	Carp::croak( "$file is not a valid web service found in E4SE." ) unless $self->_valid_file($file);
+	my $wsdl = $self->get_object($file);
+	my @ops = $wsdl->operations(port=>$self->_get_port($file));
+	return [map{$_->name} @ops];
 }
 
 1; # End of WebService::E4SE

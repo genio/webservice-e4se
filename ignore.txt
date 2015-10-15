@@ -17,4 +17,5 @@ pm_to_blib
 WebService-E4SE-*
 WebService-E4SE-*.tar.gz
 chase.pl
+chase2.pl
 .travis.yml
