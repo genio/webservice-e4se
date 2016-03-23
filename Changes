@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.050     2016-03-23
     - Changed to Dist::Zilla
     - Updated endpoint list
     - Cleaned up documentation
