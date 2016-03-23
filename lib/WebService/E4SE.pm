@@ -20,7 +20,7 @@ use namespace::clean;
 use v5.10;
 
 our $AUTHORITY = 'cpan:CAPOEIRAB';
-our $VERSION   = '0.04';
+our $VERSION   = '0.050';
 $VERSION = eval $VERSION;
 
 has _ua => (

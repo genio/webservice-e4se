@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -67,21 +67,21 @@
    "provides" : {
       "WebService::E4SE" : {
          "file" : "lib/WebService/E4SE.pm",
-         "version" : "0.04"
+         "version" : "0.050"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/p5-shorten/webservice-e4se/issues"
+         "web" : "https://github.com/genio/webservice-e4se/issues"
       },
-      "homepage" : "https://github.com/p5-shorten/webservice-e4se",
+      "homepage" : "https://github.com/genio/webservice-e4se",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/p5-shorten/webservice-e4se.git",
-         "web" : "https://github.com/p5-shorten/webservice-e4se"
+         "url" : "https://github.com/genio/webservice-e4se.git",
+         "web" : "https://github.com/genio/webservice-e4se"
       }
    },
-   "version" : "0.04"
+   "version" : "0.050"
 }
 

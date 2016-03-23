@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "WebService-E4SE",
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WebService::E4SE",
   "PREREQ_PM" => {
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::LWP::UserAgent" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.050",
   "test" => {
     "TESTS" => "t/*.t"
   }
