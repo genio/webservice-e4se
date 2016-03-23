@@ -22,14 +22,14 @@ my $res = $ws->files();
 say Dumper $res;
 
 # returns a list of method names for the file you wanted to know about.
-my @operations = $ws->operations('Resource.asmx');
+my @operations = $ws->operations('Resource');
 say Dumper @operations;
 
 # call a method and pass some named parameters to it
-my ($res,$trace) = $ws->call('Resource.asmx','GetResourceForUserID', userID=>'someuser');
+my ($res,$trace) = $ws->call('Resource','GetResourceForUserID', userID=>'someuser');
 
 # give me the XML::Compile::WSDL11 object
-my $wsdl = $ws->get_object('Resource.asmx'); #returns the usable XML::Compile::WSDL11 object
+my $wsdl = $ws->get_object('Resource'); #returns the usable XML::Compile::WSDL11 object
 ```
 
 ## DESCRIPTION
@@ -79,7 +79,7 @@ This should be the base [URL](https://metacpan.org/pod/URI) for your E4SE instal
 
 ```perl
 my $files = $ws->files;
-$files = $ws->files(['file1.asmx', 'file2.asmx']);
+$files = $ws->files(['file1', 'file2']);
 say join ', ', @$files;
 ```
 
@@ -146,7 +146,7 @@ Usually, you need to prefix this with the domain your E4SE installation is using
 ```perl
 use Try::Tiny;
 try {
-	my ( $res, $trace) = $ws->call('Resource.asmx', 'GetResourceForUserID', %parameters );
+	my ( $res, $trace) = $ws->call('Resource', 'GetResourceForUserID', %parameters );
 	say Dumper $res;
 }
 catch {
@@ -162,13 +162,13 @@ it's just a little wrapper around [XML::Compile::WSDL11](https://metacpan.org/po
 Another way to do this would be
 
 ```perl
-$ws->get_object('Reource.asmx')->call( 'GetResourceForUserID', %params );
+$ws->get_object('Reource')->call( 'GetResourceForUserID', %params );
 ```
 
 ### get_object
 
 ```perl
-my $wsdl = $ws->get_object('Resource.asmx');
+my $wsdl = $ws->get_object('Resource');
 ```
 
 This method will return an [XML::Compile::WSDL11](https://metacpan.org/pod/XML::Compile::WSDL11) object for the file name
@@ -191,7 +191,7 @@ that are available for the given file.
 
 ## AUTHOR
 
-Chase Whitener << <cwhitener at gmail.com> >>
+Chase Whitener -- capoeirab@cpan.org
 
 ## BUGS
 
