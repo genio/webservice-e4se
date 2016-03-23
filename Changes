@@ -7,6 +7,7 @@ Revision history for {{$dist->name}}
     - removed need for asmx extension on files
     - Fixed licensing discrepancies
     - perltidied
+    - Updated to use XML::Compile::Licensed for sharepoint endpoint
 
 0.04    2015-10-14
     - Fixed problems with newer version of XML::Compile
