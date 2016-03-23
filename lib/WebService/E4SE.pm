@@ -7,6 +7,7 @@ use HTTP::Headers;
 use HTTP::Request;
 use Scalar::Util ();
 use URI 1.60;
+use XML::Compile::Licensed            ();
 use XML::Compile::SOAP11              ();
 use XML::Compile::SOAP12              ();
 use XML::Compile::SOAP11::Client      ();
